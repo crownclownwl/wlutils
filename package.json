@@ -9,6 +9,11 @@
   "keywords": [
     "utils"
   ],
+  "homepage": "https://github.com/crownclownwl/wlutils",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/crownclownwl/wlutils"
+  },
   "author": "crownclownwl",
   "license": "ISC",
   "dependencies": {
