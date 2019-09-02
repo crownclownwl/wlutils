@@ -1,5 +1,5 @@
 {
-  "name": "wlutils",
+  "name": "idsutil",
   "version": "0.0.5",
   "description": "主要用于npm相关的前端js开发，集成一些公用的工具类，方便项目其他组员导入工具类",
   "main": "index.js",
