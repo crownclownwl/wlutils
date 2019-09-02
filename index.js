@@ -329,7 +329,7 @@ var wlutils = {
         }
         // S1：获取应用菜单
         axios.get(`http://school.idealworkshops.com/server/api/Apps?school_id=${window.schoolId}&mode=${type}`).then(res => {
-            if(this.isNotEmpty(res) && this.isNotEmpty(getObjProperty('data', res))){
+            if(this.isNotEmpty(res) && this.isNotEmpty(this.getObjProperty('data', res))){
 
                 // S2：循环找到和 key 相等的菜单
                 for (var item of this.getObjProperty('data', res)) {
