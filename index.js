@@ -3,9 +3,9 @@
  * @description: 包括入参验证等方法
  * @require model:loadsh
  * @author: 王磊
- * @version 0.0.5
+ * @version 0.0.6
  * @time: 2019年8月26日 10点00分
- * @lastEditTime: 2019年8月29日 14点07分
+ * @lastEditTime: 2019年9月2日 14点29分
  * @lastEditors: 王磊
  */
 var _ = require('lodash');
