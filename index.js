@@ -3,6 +3,7 @@
  * @description: 包括入参验证等方法
  * @require model:loadsh
  * @author: 王磊
+ * @version 0.0.5
  * @time: 2019年8月26日 10点00分
  * @lastEditTime: 2019年8月29日 14点07分
  * @lastEditors: 王磊
@@ -11,7 +12,10 @@ var _ = require('lodash');
 var stringify = require('qs').stringify;
 var axios = require('axios');
 
-
+/**
+ * @exports wluitls
+ * @type {Object}
+ */
 var wlutils = {
     /**
      * 文件资源访问路径前缀
@@ -27,9 +31,10 @@ var wlutils = {
      *
      * @function
      * @exports objHasOwnProperty
-     * @example import * as Utils from '@/services/util';
-     *          let a = {'b': 1};
-     *          Utils.objHasOwnProperty('b', a);  // 应该返回 true
+     * @example 
+     *          import wlutils from 'idsutil';
+     *          var a = {'b': 1};
+     *          wlutils.objHasOwnProperty('b', a);  // 应该返回 true
      *
      * @param {string} value    需要检验的key
      * @require model:loadsh
@@ -40,11 +45,11 @@ var wlutils = {
      *
      */
     objHasOwnProperty(value, obj, isTrue = false) {
-        let isExist = isNotEmpty(value) && value !== 'undefined' && value !== 'null' && value !== '{}' && value !== '[]'
+        var isExist = this.isNotEmpty(value) && value !== 'undefined' && value !== 'null' && value !== '{}' && value !== '[]'
                 && value !== 'object' && value !== 'Object'
-                && isNotEmpty(obj) && obj !== 'undefined' && obj !== 'null' && obj !== '{}' && obj !== '[]'
+                && this.isNotEmpty(obj) && obj !== 'undefined' && obj !== 'null' && obj !== '{}' && obj !== '[]'
                 && obj !== 'object' && obj !== 'Object'
-                && value in obj && isNotEmpty(obj[value]) && obj[value] !== 'undefined' && obj[value] !== 'null'
+                && value in obj && this.isNotEmpty(obj[value]) && obj[value] !== 'undefined' && obj[value] !== 'null'
                 && obj[value] !== '{}' && obj[value] !== '[]' && obj[value] !== 'object' && obj[value] !== 'Object'
                 || (isTrue === true && Object.prototype.hasOwnProperty.call(obj, value));
 
@@ -63,9 +68,10 @@ var wlutils = {
      *
      * @function
      * @exports getObjProperty
-     * @example import * as Utils from '@/services/util';
-     *          let a = {'b': 1};
-     *          Utils.getObjProperty('b', a);  // 应该返回 1
+     * @example 
+     *          import wlutils from 'idsutil';
+     *          var a = {'b': 1};
+     *          wlutils.getObjProperty('b', a);  // 应该返回 1
      *
      * @param {string} key 对象中的key
      * @param {Object} obj 对象
@@ -76,14 +82,14 @@ var wlutils = {
      */
     getObjProperty(key, obj, defaultValue = null) {
         // 判断key值是不是带层级，也就是存在 a.b.c.d.e
-        if (isNotEmpty(key) && isNotEmpty(obj)) {
+        if (this.isNotEmpty(key) && this.isNotEmpty(obj)) {
 
             if (key.indexOf('.') === -1) {
-                return objHasOwnProperty(key, obj) === true ? obj[key] : defaultValue;
+                return this.objHasOwnProperty(key, obj) === true ? obj[key] : defaultValue;
             }
-            let keys = key.split('.');
-            for (let kesItem of keys) {
-                if (objHasOwnProperty(kesItem, obj)) {
+            var keys = key.split('.');
+            for (var kesItem of keys) {
+                if (this.objHasOwnProperty(kesItem, obj)) {
                     obj = obj[kesItem];
                 } else {
                     return defaultValue;
@@ -101,9 +107,10 @@ var wlutils = {
      * @function
      * @exports isEmpty
      * @require model:loadsh
-     * @example import * as Utils from '@/services/util';
-     *          let a = {'b': 1};
-     *          Utils.isEmpty(a);  // 应该返回 false
+     * @example 
+     *          import wlutils from 'idsutil';
+     *          var a = {'b': 1};
+     *          wlutils.isEmpty(a);  // 应该返回 false
      * @param {*} value 要判断的参数
      * @return {boolean} 对象是否为空
      */
@@ -111,7 +118,7 @@ var wlutils = {
         // return value === undefined || value === null || value === ''
         // || (value instanceof Array && Object.prototype.hasOwnProperty.bind('length', value) && value.length === 0)
         // || (value instanceof Object && Object.keys(value).length === 0);
-        let isTrue = _.isNull(value) || _.isEmpty(value) || value === 'undefined' 
+        var isTrue = _.isNull(value) || _.isEmpty(value) || value === 'undefined' 
             || value === 'null' || value === '[]' || value === '{}'
             || value === 'object' || value === 'Object';
 
@@ -131,14 +138,15 @@ var wlutils = {
      * @function
      * @exports isNotEmpty
      * @require model:loadsh
-     * @example import * as Utils from '@/services/util';
-     *          let a = {};
-     *          Utils.isNotEmpty(a);  // 应该返回 false
+     * @example 
+     *          import wlutils from 'idsutil';
+     *          var a = {};
+     *          wlutils.isNotEmpty(a);  // 应该返回 false
      * @param {*} value 要判断的参数
      * @return {boolean} 对象是否为空
      */
     isNotEmpty(value) {
-        return !isEmpty(value);
+        return !this.isEmpty(value);
     },
 
     /**
@@ -149,15 +157,15 @@ var wlutils = {
      * @exports loadMutilview
      * @requires model:cordova.js
      * @example
-     *          import * as Utils from '@/services/util';
-     *          Utils.loadMutilview('http://school.idealworkshops.com/devserver/student_transcript/1.0.0/#/main/page');
+     *          import wlutils from 'idsutil';
+     *          wlutils.loadMutilview('http://school.idealworkshops.com/devserver/student_transcript/1.0.0/#/main/page');
      * @param {string} url 内部应用地址
      * @param {Object} data 请求参数 
      * @param {Function} success 成功回调函数
      * @param {Function} error 失败回调函数
      */
     loadMutilview(url, data, success, error) {
-        PGMultiView.loadView(url, JSON.stringify(data || {}), success, error);
+        this.isNotEmpty(PGMultiView) &&  PGMultiView.loadView(url, JSON.stringify(data || {}), success, error);
     },
 
     /**
@@ -178,7 +186,7 @@ var wlutils = {
      * @param {string} type 应用类型，'production' 是非开发者模式，'developer' 是开发者模式
      */
     goToAppHomeByKey(key, type= 'developer') {
-        if(isEmpty(key)){
+        if(this.isEmpty(key)){
             console.error("--------------------");
             console.error(`${key} 调用跳转应用首页失败，未接收到key`);
             console.error("--------------------");
@@ -191,7 +199,7 @@ var wlutils = {
          * @private
          * @type {string}
          */
-        let goToAppUrl = '';
+        var goToAppUrl = '';
 
         /**
          * 跳转页面成功回调
@@ -201,7 +209,7 @@ var wlutils = {
          * @private
          * @param {Object} res http响应数据对象
          */
-        let succCallBack = function(res){
+        var succCallBack = function(res){
             console.log("++++++++++++++++++++");
             console.log(`${key} 调用跳转应用首页成功`);
             console.log(res);
@@ -216,7 +224,7 @@ var wlutils = {
          * @private
          * @param {Object} res http响应数据对象
          */
-        let errorCallBack = function(res){
+        var errorCallBack = function(res){
             console.error("--------------------");
             console.error(`${key} 调用跳转应用首页失败`);
             console.error(res);
@@ -224,21 +232,21 @@ var wlutils = {
         }
         // S1：获取应用菜单
         axios.get(`http://school.idealworkshops.com/server/api/Apps?school_id=${window.schoolId}&mode=${type}`).then(res => {
-            if(isNotEmpty(res) && isNotEmpty(getObjProperty('data', res))){
+            if(this.isNotEmpty(res) && this.isNotEmpty(getObjProperty('data', res))){
 
                 // S2：循环找到和 key 相等的菜单
-                for (let item of getObjProperty('data', res)) {
-                    if (window.userType === '2' && getObjProperty('category', item) === '日常应用'){
-                        for(let menuItem of getObjProperty('apps', item, [])){
-                            if (key === getObjProperty('key', menuItem)) {
-                                goToAppUrl = getObjProperty('url', menuItem)
+                for (var item of this.getObjProperty('data', res)) {
+                    if (window.userType === '2' && this.getObjProperty('category', item) === '日常应用'){
+                        for(var menuItem of this.getObjProperty('apps', item, [])){
+                            if (key === this.getObjProperty('key', menuItem)) {
+                                goToAppUrl = this.getObjProperty('url', menuItem)
                                 break;
                             }
                         }
-                    }else if (window.userType === '1' && getObjProperty('category', item) !== '日常应用') {
-                        for(let menuItem of getObjProperty('apps', item, [])){
-                            if (key === getObjProperty('key', menuItem)) {
-                                goToAppUrl = getObjProperty('url', menuItem)
+                    }else if (window.userType === '1' && this.getObjProperty('category', item) !== '日常应用') {
+                        for(var menuItem of this.getObjProperty('apps', item, [])){
+                            if (key === this.getObjProperty('key', menuItem)) {
+                                goToAppUrl = this.getObjProperty('url', menuItem)
                                 break;
                             }
                         }
@@ -246,8 +254,8 @@ var wlutils = {
                 }
 
                 // S3：如果找到了菜单就跳转到指定页面
-                if(isNotEmpty(goToAppUrl)){
-                    loadMutilview(goToAppUrl, {}, succCallBack, errorCallBack);
+                if(this.isNotEmpty(goToAppUrl)){
+                    this.loadMutilview(goToAppUrl, {}, succCallBack, errorCallBack);
                 }
             }
         });
@@ -264,8 +272,8 @@ var wlutils = {
      * @requires model:qs.stringify
      * @requires model:cordova.js
      * @example
-     *          import * as Utils from '@/services/util';
-     *          Utils.goToAppDetailByKey(key, ruoter);
+     *          import wlutils from 'idsutil';
+     *          wlutils.goToAppDetailByKey(key, ruoter);
      *          // key 如果不知道是啥，可以访问如下地址，传一个你的 学校id即可
      *          // 根据汉字找到对应app的key
      *          // http://school.idealworkshops.com/server/api/Apps?school_id=J5swpFAatT6ng34sDtK&mode=developer
@@ -275,7 +283,7 @@ var wlutils = {
      * @param {string} type 应用类型，'production' 是非开发者模式，'developer' 是开发者模式
      */
     goToAppDetailByKey(key, router, param={}, type= 'developer') {
-        if(isEmpty(key) || isEmpty(router)){
+        if(this.isEmpty(key) || this.isEmpty(router)){
             console.error("--------------------");
             console.error(`${key} 调用跳转应用详情页失败，未接收到key`);
             console.error("--------------------");
@@ -288,7 +296,7 @@ var wlutils = {
          * @private
          * @type {string}
          */
-        let goToAppUrl = '';
+        var goToAppUrl = '';
 
         /**
          * 跳转页面成功回调
@@ -298,7 +306,7 @@ var wlutils = {
          * @private
          * @param {Object} res http响应数据对象
          */
-        let succCallBack = function(res){
+        var succCallBack = function(res){
             console.log("++++++++++++++++++++");
             console.log(`${key} 调用跳转应用详情页成功`);
             console.log(res);
@@ -313,7 +321,7 @@ var wlutils = {
          * @private
          * @param {Object} res http响应数据对象
          */
-        let errorCallBack = function(res){
+        var errorCallBack = function(res){
             console.error("--------------------");
             console.error(`${key} 调用跳转应用详情页失败`);
             console.error(res);
@@ -321,34 +329,34 @@ var wlutils = {
         }
         // S1：获取应用菜单
         axios.get(`http://school.idealworkshops.com/server/api/Apps?school_id=${window.schoolId}&mode=${type}`).then(res => {
-            if(isNotEmpty(res) && isNotEmpty(getObjProperty('data', res))){
+            if(this.isNotEmpty(res) && this.isNotEmpty(getObjProperty('data', res))){
 
                 // S2：循环找到和 key 相等的菜单
-                for (let item of getObjProperty('data', res)) {
+                for (var item of this.getObjProperty('data', res)) {
                     // S3：根据用户类型判断菜单，排除重复key
-                    if(window.userType === '2' && getObjProperty('category', item) === '日常应用'){
-                        for(let menuItem of getObjProperty('apps', item, [])){
-                            if (key === getObjProperty('key', menuItem)) {
-                                goToAppUrl = getObjProperty('url', menuItem)
+                    if(window.userType === '2' && this.getObjProperty('category', item) === '日常应用'){
+                        for(var menuItem of this.getObjProperty('apps', item, [])){
+                            if (key === this.getObjProperty('key', menuItem)) {
+                                goToAppUrl = this.getObjProperty('url', menuItem)
                                 
                                 // S3：直接跳转
                                 // eslint-disable-next-line
-                                goToAppUrl = `${window.location.origin}/${type === 'developer' ? 'devserver' : 'appserver' }/${key}/${getObjProperty('version', menuItem)}/#${router}${isNotEmpty(param) ? '?'+ stringify(params) : ''}`
-                                loadMutilview(goToAppUrl, {}, succCallBack, errorCallBack);
+                                goToAppUrl = `${window.location.origin}/${type === 'developer' ? 'devserver' : 'appserver' }/${key}/${this.getObjProperty('version', menuItem)}/#${router}${isNotEmpty(param) ? '?'+ stringify(params) : ''}`
+                                this.loadMutilview(goToAppUrl, {}, succCallBack, errorCallBack);
                                 break;
                             }
                         }
-                    }else if (window.userType === '1' && getObjProperty('category', item) !== '日常应用') {
-                        for(let menuItem of getObjProperty('apps', item, [])){
-                            if (key === getObjProperty('key', menuItem)) {
-                                goToAppUrl = getObjProperty('url', menuItem)
+                    }else if (window.userType === '1' && this.getObjProperty('category', item) !== '日常应用') {
+                        for(var menuItem of this.getObjProperty('apps', item, [])){
+                            if (key === this.getObjProperty('key', menuItem)) {
+                                goToAppUrl = this.getObjProperty('url', menuItem)
                                 
                                 // S3：直接跳转
                                 // eslint-disable-next-line
                                 console.log('${window.location.origin}');
                                 console.log(window.location.origin);
-                                goToAppUrl = `${window.location.origin}/${type === 'developer' ? 'devserver' : 'appserver' }/${key}/${getObjProperty('version', menuItem)}/#${router}${isNotEmpty(param) ? '?'+ stringify(params) : ''}`
-                                loadMutilview(goToAppUrl, {}, succCallBack, errorCallBack);
+                                goToAppUrl = `${window.location.origin}/${type === 'developer' ? 'devserver' : 'appserver' }/${key}/${this.getObjProperty('version', menuItem)}/#${router}${isNotEmpty(param) ? '?'+ stringify(params) : ''}`
+                                this.loadMutilview(goToAppUrl, {}, succCallBack, errorCallBack);
                                 break;
                             }
                         }
@@ -371,10 +379,10 @@ var wlutils = {
      * @param {string} type 系统类型，默认是 'Guanliruanjian'
      * @return {string} 浏览器可以访问的文件地址
      * @example
-     *          import * as Utils from '@/services/util'
+     *          import wlutils from 'idsutil';
      *          // 在app.js 中添加如下代码，获取原生学校系统配置
      *          // windos.schoolSystemsConf = schoolInfo.systems;        // 学校系统相关配置
-     *          let testToArray = {
+     *          var testToArray = {
      *              "id":"9sql5RBswhDwZby5fSV",
      *              "createDate":"2019-08-27 17:18:36",
      *              "updateDate":"2019-08-29 10:22:18",
@@ -388,10 +396,10 @@ var wlutils = {
      *            }
      *          };
      *
-     *          let convertedArray = Utils.toArrayWithItem(Utils.getObjProperty('fileUrl', testToArray));
+     *          var convertedArray = wlutils.toArrayWithItem(wlutils.getObjProperty('fileUrl', testToArray));
      *          // 返回如下数据：
      *          
-     *          let result = [
+     *          var result = [
      *                 {
      *                     key: '/ueditor/file/20190829/1567045335126084955.xlsx',
      *                     text: '2018年学生导入数据模板_20181024142346.xlsx'
@@ -402,14 +410,14 @@ var wlutils = {
      *                 }
      *           ];
      * 
-     *           let covertUri = Utils.getFileUrl(Utils.getObjProperty('0.key', convertedArray));
+     *           var covertUri = wlutils.getFileUrl(wlutils.getObjProperty('0.key', convertedArray));
      *           // 返回如下数据：
-     *           let result1 = 'http://124.235.206.62:9997/fileSys/uploadResource/ueditor/file/20190829/1567045335126084955.xlsx';
+     *           var result1 = 'http://124.235.206.62:9997/fileSys/uploadResource/ueditor/file/20190829/1567045335126084955.xlsx';
      */
     getFileUrl(url, type= 'Guanliruanjian'){
-        let uri = null;
+        var uri = null;
         // S1：入参校验
-        if(isEmpty(url) || isEmpty(window.schoolSystemsConf)){
+        if(this.isEmpty(url) || this.isEmpty(window.schoolSystemsConf)){
             console.error("--------------------");
             console.error("请检查资源路径或者window对象中是否存在schoolSystemsConf变量！");
             console.error("--------------------");
@@ -417,14 +425,14 @@ var wlutils = {
         }
 
         // S2：获取原生的学校配置中的资源地址
-        for (let systemConf of getObjProperty('schoolSystemsConf', window)) {
+        for (var systemConf of this.getObjProperty('schoolSystemsConf', window)) {
             
             // S3：根据type获取管理系统还是教学系统还是其他系统
-            if ( type === getObjProperty('name', systemConf)) {
+            if ( type === this.getObjProperty('name', systemConf)) {
                 // S4：找到外网地址，如果没有就用对应的内网地址
-                uri =  getObjProperty('host_wan', systemConf, 
-                        getObjProperty('host_lan', systemConf, ''));
-                uri += FILERESCOURURLPREFIX + url;
+                uri =  this.getObjProperty('host_wan', systemConf,
+                    this.getObjProperty('host_lan', systemConf, ''));
+                uri += this.FILERESCOURURLPREFIX + url;
                 return uri;
             }
             
@@ -450,8 +458,8 @@ var wlutils = {
      *                          ......
      *                      ]
      * @example 
-     *          import * as Utils from '@/services/util';
-     *          let testToArray = {
+     *          import wlutils from 'idsutil';
+     *          var testToArray = {
      *              "id":"9sql5RBswhDwZby5fSV",
      *              "createDate":"2019-08-27 17:18:36",
      *              "updateDate":"2019-08-29 10:22:18",
@@ -465,10 +473,10 @@ var wlutils = {
      *            }
      *          };
      *
-     *          let convertedArray = Utils.toArrayWithItem(Utils.getObjProperty('fileUrl', testToArray));
+     *          var convertedArray = wlutils.toArrayWithItem(wlutils.getObjProperty('fileUrl', testToArray));
      *          // 返回如下数据：
      *          
-     *          let result = [
+     *          var result = [
      *                 {
      *                     key: '/ueditor/file/20190829/1567045335126084955.xlsx',
      *                     text: '2018年学生导入数据模板_20181024142346.xlsx'
@@ -481,10 +489,10 @@ var wlutils = {
      *           
      */
     toArrayWithItem(obj){
-        let newArray = [];
+        var newArray = [];
 
         // S1：入参校验
-        if (isEmpty(obj)) {
+        if (this.isEmpty(obj)) {
             console.error("--------------------");
             console.error("没有获取到访问的资源路径！");
             console.error("--------------------");
@@ -492,14 +500,14 @@ var wlutils = {
         }
 
         // S2：循环对象吧对象的key和value拆成item对象，放到newArray数组中
-        for(let key of Object.keys(obj)){
+        for(var key of Object.keys(obj)){
             newArray.push({
                 key: key,
-                text: objHasOwnProperty(key, obj) === true ? obj[key] : ''
+                text: this.objHasOwnProperty(key, obj) === true ? obj[key] : ''
             });
         }
 
         return newArray;
     }
 }
-model.exports = wlutils;
+export default wlutils;
