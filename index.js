@@ -3,7 +3,7 @@
  * @description: 包括入参验证等方法
  * @require model:loadsh
  * @author: 王磊
- * @version 0.0.6
+ * @version 0.0.7
  * @time: 2019年8月26日 10点00分
  * @lastEditTime: 2019年9月2日 14点29分
  * @lastEditors: 王磊
@@ -185,7 +185,7 @@ var wlutils = {
      * @param {string} key 需要跳转应用对应的key
      * @param {string} type 应用类型，'production' 是非开发者模式，'developer' 是开发者模式
      */
-    goToAppHomeByKey(key, type= 'developer') {
+    goToAppHomeByKey(key, type= 'production') {
         if(this.isEmpty(key)){
             console.error("--------------------");
             console.error(`${key} 调用跳转应用首页失败，未接收到key`);
@@ -232,7 +232,7 @@ var wlutils = {
         }
         // S1：获取应用菜单
         axios.get(`http://school.idealworkshops.com/server/api/Apps?school_id=${window.schoolId}&mode=${type}`).then(res => {
-            if(this.isNotEmpty(res) && this.isNotEmpty(getObjProperty('data', res))){
+            if(this.isNotEmpty(res) && this.isNotEmpty(this.getObjProperty('data', res))){
 
                 // S2：循环找到和 key 相等的菜单
                 for (var item of this.getObjProperty('data', res)) {
@@ -282,7 +282,7 @@ var wlutils = {
      * @param {string} router 需要跳转的详细页面的路由地址
      * @param {string} type 应用类型，'production' 是非开发者模式，'developer' 是开发者模式
      */
-    goToAppDetailByKey(key, router, param={}, type= 'developer') {
+    goToAppDetailByKey(key, router, param={}, type= 'production') {
         if(this.isEmpty(key) || this.isEmpty(router)){
             console.error("--------------------");
             console.error(`${key} 调用跳转应用详情页失败，未接收到key`);
@@ -341,7 +341,7 @@ var wlutils = {
                                 
                                 // S3：直接跳转
                                 // eslint-disable-next-line
-                                goToAppUrl = `${window.location.origin}/${type === 'developer' ? 'devserver' : 'appserver' }/${key}/${this.getObjProperty('version', menuItem)}/#${router}${isNotEmpty(param) ? '?'+ stringify(params) : ''}`
+                                goToAppUrl = `${window.location.origin}/${type === 'developer' ? 'devserver' : 'appserver' }/${key}/${this.getObjProperty('version', menuItem)}/#${router}${this.isNotEmpty(param) ? '?'+ stringify(params) : ''}`
                                 this.loadMutilview(goToAppUrl, {}, succCallBack, errorCallBack);
                                 break;
                             }
@@ -355,7 +355,7 @@ var wlutils = {
                                 // eslint-disable-next-line
                                 console.log('${window.location.origin}');
                                 console.log(window.location.origin);
-                                goToAppUrl = `${window.location.origin}/${type === 'developer' ? 'devserver' : 'appserver' }/${key}/${this.getObjProperty('version', menuItem)}/#${router}${isNotEmpty(param) ? '?'+ stringify(params) : ''}`
+                                goToAppUrl = `${window.location.origin}/${type === 'developer' ? 'devserver' : 'appserver' }/${key}/${this.getObjProperty('version', menuItem)}/#${router}${this.isNotEmpty(param) ? '?'+ stringify(params) : ''}`
                                 this.loadMutilview(goToAppUrl, {}, succCallBack, errorCallBack);
                                 break;
                             }
