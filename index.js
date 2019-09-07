@@ -3,9 +3,9 @@
  * @description: 包括入参验证等方法
  * @require model:loadsh
  * @author: 王磊
- * @version 0.0.8
+ * @version 0.0.11
  * @time: 2019年8月26日 10点00分
- * @lastEditTime: 2019年9月2日 14点29分
+ * @lastEditTime: 2019年9月4日 10点07分
  * @lastEditors: 王磊
  */
 var _ = require('lodash');
@@ -118,7 +118,7 @@ var wlutils = {
         // return value === undefined || value === null || value === ''
         // || (value instanceof Array && Object.prototype.hasOwnProperty.bind('length', value) && value.length === 0)
         // || (value instanceof Object && Object.keys(value).length === 0);
-        var isTrue = _.isNull(value) || value === 'undefined' 
+        var isTrue = _.isNull(value) || _.isEmpty(value) || value === 'undefined' 
             || value === 'null' || value === '[]' || value === '{}'
             || value === 'object' || value === 'Object';
 
@@ -127,6 +127,11 @@ var wlutils = {
             isTrue = isTrue || value.trim() === 'undefined' || value.trim()  === 'null'
                 || value.trim() === '{}' || value.trim() === '[]'
                 || value.trim() === 'object' || value.trim() === 'Object'
+        }
+
+        // 如果是数字
+        if (typeof value === 'number') {
+            isTrue = value === 0;
         }
 
         return isTrue;
