@@ -3,9 +3,9 @@
  * @description: 包括入参验证等方法
  * @require model:loadsh
  * @author: 王磊
- * @version 0.0.11
+ * @version 0.0.12
  * @time: 2019年8月26日 10点00分
- * @lastEditTime: 2019年9月4日 10点07分
+ * @lastEditTime: 2019年9月12日 15点35分
  * @lastEditors: 王磊
  */
 var _ = require('lodash');
@@ -85,13 +85,20 @@ var wlutils = {
         if (this.isNotEmpty(key) && this.isNotEmpty(obj)) {
 
             if (key.indexOf('.') === -1) {
-                return this.objHasOwnProperty(key, obj) === true ? obj[key] : defaultValue;
+                if (this.objHasOwnProperty(key, obj) === true) {
+                    obj = obj[key]
+                }else {
+                    console.error(`对象${obj}中没有找到属性'${key}'或者该属性为空`);
+                    obj = defaultValue
+                }
+                return obj;
             }
             var keys = key.split('.');
             for (var kesItem of keys) {
-                if (this.objHasOwnProperty(kesItem, obj)) {
+                if (this.objHasOwnProperty(kesItem, obj) === true) {
                     obj = obj[kesItem];
                 } else {
+                    console.error(`对象${obj}中没有找到属性'${key}'或者该属性为空`);
                     return defaultValue;
                 }
             }
@@ -185,12 +192,13 @@ var wlutils = {
      *          Utils.goToAppHomeByKey(key);        // 直接调转页面
      *          // key 如果不知道是啥，可以访问如下地址，传一个你的 学校id即可
      *          // 根据汉字找到对应app的key
-     *          // http://school.idealworkshops.com/server/api/Apps?school_id=J5swpFAatT6ng34sDtK&mode=developer
-     * @link http://school.idealworkshops.com/server/api/Apps?school_id=J5swpFAatT6ng34sDtK&mode=developer
+     * @link http://school.idealworkshops.com/server/api/Apps?school_id=J5swpFAatT6ng34sDtK&mode=production 生产环境
+     * @link http://124.235.206.62:12392/server/api/Apps?school_id=J5swpFAatT6ng34sDtK&mode=production 开发环境
+     * @link http://124.235.206.62:12393/server/api/Apps?school_id=J5swpFAatT6ng34sDtK&mode=production 测试环境
      * @param {string} key 需要跳转应用对应的key
      * @param {string} type 应用类型，'production' 是非开发者模式，'developer' 是开发者模式
      */
-    goToAppHomeByKey(key, type= 'production') {
+    goToAppHomeByKey(key, type='production') {
         if(this.isEmpty(key)){
             console.error("--------------------");
             console.error(`${key} 调用跳转应用首页失败，未接收到key`);
@@ -236,7 +244,7 @@ var wlutils = {
             console.error("--------------------");
         }
         // S1：获取应用菜单
-        axios.get(`http://school.idealworkshops.com/server/api/Apps?school_id=${window.schoolId}&mode=${type}`).then(res => {
+        axios.get(`http://${window.location.host}/server/api/Apps?school_id=${window.schoolId}&mode=${type}`).then(res => {
             if(this.isNotEmpty(res) && this.isNotEmpty(this.getObjProperty('data', res))){
 
                 // S2：循环找到和 key 相等的菜单
@@ -281,8 +289,9 @@ var wlutils = {
      *          wlutils.goToAppDetailByKey(key, ruoter);
      *          // key 如果不知道是啥，可以访问如下地址，传一个你的 学校id即可
      *          // 根据汉字找到对应app的key
-     *          // http://school.idealworkshops.com/server/api/Apps?school_id=J5swpFAatT6ng34sDtK&mode=developer
-     * @link http://school.idealworkshops.com/server/api/Apps?school_id=J5swpFAatT6ng34sDtK&mode=developer
+     * @link http://school.idealworkshops.com/server/api/Apps?school_id=J5swpFAatT6ng34sDtK&mode=production 生产环境
+     * @link http://124.235.206.62:12392/server/api/Apps?school_id=J5swpFAatT6ng34sDtK&mode=production 开发环境
+     * @link http://124.235.206.62:12393/server/api/Apps?school_id=J5swpFAatT6ng34sDtK&mode=production 测试环境
      * @param {string} key 需要跳转应用对应的key，注意添加app应用的时候key必须和服务器目录名称一致
      * @param {string} router 需要跳转的详细页面的路由地址
      * @param {string} type 应用类型，'production' 是非开发者模式，'developer' 是开发者模式
@@ -333,7 +342,7 @@ var wlutils = {
             console.error("--------------------");
         }
         // S1：获取应用菜单
-        axios.get(`http://school.idealworkshops.com/server/api/Apps?school_id=${window.schoolId}&mode=${type}`).then(res => {
+        axios.get(`http://${window.location.host}/server/api/Apps?school_id=${window.schoolId}&mode=${type}`).then(res => {
             if(this.isNotEmpty(res) && this.isNotEmpty(this.getObjProperty('data', res))){
 
                 // S2：循环找到和 key 相等的菜单
