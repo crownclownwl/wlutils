@@ -3,9 +3,9 @@
  * @description: 包括入参验证等方法
  * @require model:loadsh
  * @author: 王磊
- * @version 0.0.16
+ * @version 0.0.17
  * @time: 2019年8月26日 10点00分
- * @lastEditTime: 2019年9月25日 09点23分
+ * @lastEditTime: 2019年9月25日 09点56分
  * @lastEditors: 王磊
  */
 var _ = require('lodash');
@@ -23,7 +23,7 @@ var wlutils = {
      * @protected
      * @exports FILERESCOURURL
      */
-    FILERESCOURURLPREFIX: '/fileSys/uploadResource',
+    FILERESCOURURLPREFIX: '/guanlixitong/fileSys/',
 
     /**
      * 判断某个属性是否存在于某个对象中，
@@ -403,7 +403,7 @@ var wlutils = {
      * 
      *           var covertUri = wlutils.getFileUrl(wlutils.getObjProperty('0.key', convertedArray));
      *           // 返回如下数据：
-     *           var result1 = 'http://124.235.206.62:38110/fileSys/uploadResource/ueditor/file/20190829/1567045335126084955.xlsx';
+     *           var result1 = 'http://124.235.206.62:38110/guanlixitong/fileSys//ueditor/file/20190829/1567045335126084955.xlsx';
      */
     getFileUrl(url, type= 'Guanliruanjian'){
         var uri = null;
@@ -431,7 +431,8 @@ var wlutils = {
         uri = null;
         if(this.objHasOwnProperty('apiGateway', window)){
             uri = window.apiGateway;
-            uri += this.FILERESCOURURLPREFIX + url;
+            uri += this.FILERESCOURURLPREFIX;
+            uri += url;
 
             return uri;
         }
