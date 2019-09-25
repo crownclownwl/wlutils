@@ -3,9 +3,9 @@
  * @description: 包括入参验证等方法
  * @require model:loadsh
  * @author: 王磊
- * @version 0.0.12
+ * @version 0.0.16
  * @time: 2019年8月26日 10点00分
- * @lastEditTime: 2019年9月12日 15点35分
+ * @lastEditTime: 2019年9月25日 09点23分
  * @lastEditors: 王磊
  */
 var _ = require('lodash');
@@ -54,10 +54,11 @@ var wlutils = {
                 || (isTrue === true && Object.prototype.hasOwnProperty.call(obj, value));
 
             // 排除字符串
-            if (typeof obj[value] === 'string') {
+            if (isExist === true && typeof obj[value] === 'string') {
                 isExist = isExist && obj[value].trim() !== 'undefined' && obj[value].trim() !== 'null'
                     && obj[value].trim() !== '{}' && obj[value].trim() !== '[]'
                     && obj[value].trim() !== 'object' && obj[value].trim() !== 'Object'
+                    && obj[value] !== ' ' && obj[value] !== '  '
             }
         return isExist;
     },
@@ -88,7 +89,7 @@ var wlutils = {
                 if (this.objHasOwnProperty(key, obj) === true) {
                     obj = obj[key]
                 }else {
-                    console.error(`对象${obj}中没有找到属性'${key}'或者该属性为空`);
+                    console.info(`对象${obj}中没有找到属性'${key}'或者该属性为空`);
                     obj = defaultValue
                 }
                 return obj;
@@ -98,7 +99,7 @@ var wlutils = {
                 if (this.objHasOwnProperty(kesItem, obj) === true) {
                     obj = obj[kesItem];
                 } else {
-                    console.error(`对象${obj}中没有找到属性'${key}'或者该属性为空`);
+                    console.info(`对象${obj}中没有找到属性'${key}'或者该属性为空`);
                     return defaultValue;
                 }
             }
@@ -134,6 +135,7 @@ var wlutils = {
             isTrue = isTrue || value.trim() === 'undefined' || value.trim()  === 'null'
                 || value.trim() === '{}' || value.trim() === '[]'
                 || value.trim() === 'object' || value.trim() === 'Object'
+                || value === ' ' || value === '  '
         }
 
         // 如果是数字
@@ -249,19 +251,10 @@ var wlutils = {
 
                 // S2：循环找到和 key 相等的菜单
                 for (var item of this.getObjProperty('data', res)) {
-                    if (window.userType === '2' && this.getObjProperty('category', item) === '日常应用'){
-                        for(var menuItem of this.getObjProperty('apps', item, [])){
-                            if (key === this.getObjProperty('key', menuItem)) {
-                                goToAppUrl = this.getObjProperty('url', menuItem)
-                                break;
-                            }
-                        }
-                    }else if (window.userType === '1' && this.getObjProperty('category', item) !== '日常应用') {
-                        for(var menuItem of this.getObjProperty('apps', item, [])){
-                            if (key === this.getObjProperty('key', menuItem)) {
-                                goToAppUrl = this.getObjProperty('url', menuItem)
-                                break;
-                            }
+                    for(var menuItem of this.getObjProperty('apps', item, [])){
+                        if (key === this.getObjProperty('key', menuItem)) {
+                            goToAppUrl = this.getObjProperty('url', menuItem)
+                            break;
                         }
                     }
                 }
@@ -348,31 +341,15 @@ var wlutils = {
                 // S2：循环找到和 key 相等的菜单
                 for (var item of this.getObjProperty('data', res)) {
                     // S3：根据用户类型判断菜单，排除重复key
-                    if(window.userType === '2' && this.getObjProperty('category', item) === '日常应用'){
-                        for(var menuItem of this.getObjProperty('apps', item, [])){
-                            if (key === this.getObjProperty('key', menuItem)) {
-                                goToAppUrl = this.getObjProperty('url', menuItem)
-                                
-                                // S3：直接跳转
-                                // eslint-disable-next-line
-                                goToAppUrl = `${window.location.origin}/${type === 'developer' ? 'devserver' : 'appserver' }/${key}/${this.getObjProperty('version', menuItem)}/#${router}${this.isNotEmpty(param) ? '?'+ stringify(params) : ''}`
-                                this.loadMutilview(goToAppUrl, {}, succCallBack, errorCallBack);
-                                break;
-                            }
-                        }
-                    }else if (window.userType === '1' && this.getObjProperty('category', item) !== '日常应用') {
-                        for(var menuItem of this.getObjProperty('apps', item, [])){
-                            if (key === this.getObjProperty('key', menuItem)) {
-                                goToAppUrl = this.getObjProperty('url', menuItem)
-                                
-                                // S3：直接跳转
-                                // eslint-disable-next-line
-                                console.log('${window.location.origin}');
-                                console.log(window.location.origin);
-                                goToAppUrl = `${window.location.origin}/${type === 'developer' ? 'devserver' : 'appserver' }/${key}/${this.getObjProperty('version', menuItem)}/#${router}${this.isNotEmpty(param) ? '?'+ stringify(params) : ''}`
-                                this.loadMutilview(goToAppUrl, {}, succCallBack, errorCallBack);
-                                break;
-                            }
+                    for(var menuItem of this.getObjProperty('apps', item, [])){
+                        if (key === this.getObjProperty('key', menuItem)) {
+                            goToAppUrl = this.getObjProperty('url', menuItem)
+                            
+                            // S3：直接跳转
+                            // eslint-disable-next-line
+                            goToAppUrl = `${window.location.origin}/${type === 'developer' ? 'devserver' : 'appserver' }/${key}/${this.getObjProperty('version', menuItem)}/#${router}${this.isNotEmpty(param) ? '?'+ stringify(params) : ''}`
+                            this.loadMutilview(goToAppUrl, {}, succCallBack, errorCallBack);
+                            break;
                         }
                     }
                 }
@@ -426,32 +403,40 @@ var wlutils = {
      * 
      *           var covertUri = wlutils.getFileUrl(wlutils.getObjProperty('0.key', convertedArray));
      *           // 返回如下数据：
-     *           var result1 = 'http://124.235.206.62:9997/fileSys/uploadResource/ueditor/file/20190829/1567045335126084955.xlsx';
+     *           var result1 = 'http://124.235.206.62:38110/fileSys/uploadResource/ueditor/file/20190829/1567045335126084955.xlsx';
      */
     getFileUrl(url, type= 'Guanliruanjian'){
         var uri = null;
         // S1：入参校验
-        if(this.isEmpty(url) || this.isEmpty(window.schoolSystemsConf)){
+        if(this.isEmpty(url) || this.isEmpty(window.apiGateway)){
             console.error("--------------------");
-            console.error("请检查资源路径或者window对象中是否存在schoolSystemsConf变量！");
+            console.error("请检查资源路径或者window对象中是否存在apiGateway变量！");
             console.error("--------------------");
             return uri;
         }
 
         // S2：获取原生的学校配置中的资源地址
-        for (var systemConf of this.getObjProperty('schoolSystemsConf', window)) {
+        // for (var systemConf of this.getObjProperty('schoolSystemsConf', window)) {
             
-            // S3：根据type获取管理系统还是教学系统还是其他系统
-            if ( type === this.getObjProperty('name', systemConf)) {
-                // S4：找到外网地址，如果没有就用对应的内网地址
-                uri =  this.getObjProperty('host_wan', systemConf,
-                    this.getObjProperty('host_lan', systemConf, ''));
-                uri += this.FILERESCOURURLPREFIX + url;
-                return uri;
-            }
+        //     // S3：根据type获取管理系统还是教学系统还是其他系统
+        //     if ( type === this.getObjProperty('name', systemConf)) {
+        //         // S4：找到外网地址，如果没有就用对应的内网地址
+        //         uri =  this.getObjProperty('host_wan', systemConf,
+        //             this.getObjProperty('host_lan', systemConf, ''));
+        //         uri += this.FILERESCOURURLPREFIX + url;
+        //         return uri;
+        //     }
             
+        // }
+        uri = null;
+        if(this.objHasOwnProperty('apiGateway', window)){
+            uri = window.apiGateway;
+            uri += this.FILERESCOURURLPREFIX + url;
+
+            return uri;
         }
         
+        console.error('window 对象中没有设置 apiGateway 属性！！！');
         return uri;
     },
 
