@@ -1,11 +1,13 @@
+import { type } from 'os';
+
 /**
  * @file: 公用工具类
  * @description: 包括入参验证等方法
  * @require model:loadsh
  * @author: 王磊
- * @version 0.0.17
+ * @version 0.0.20
  * @time: 2019年8月26日 10点00分
- * @lastEditTime: 2019年9月25日 09点56分
+ * @lastEditTime: 2019年11月16日 17点04分
  * @lastEditors: 王磊
  */
 var _ = require('lodash');
@@ -89,7 +91,7 @@ var wlutils = {
                 if (this.objHasOwnProperty(key, obj) === true) {
                     obj = obj[key]
                 }else {
-                    console.info(`对象${obj}中没有找到属性'${key}'或者该属性为空`);
+                    console.info(`对象${JSON.stringify(obj)}\n中没有找到属性'${key}'或者该属性为空`);
                     obj = defaultValue
                 }
                 return obj;
@@ -99,7 +101,7 @@ var wlutils = {
                 if (this.objHasOwnProperty(kesItem, obj) === true) {
                     obj = obj[kesItem];
                 } else {
-                    console.info(`对象${obj}中没有找到属性'${key}'或者该属性为空`);
+                    console.info(`对象${JSON.stringify(obj)}\n中没有找到属性'${key}'或者该属性为空`);
                     return defaultValue;
                 }
             }
@@ -508,6 +510,109 @@ var wlutils = {
         }
 
         return newArray;
+    },
+
+    /**
+     * 不修改原数组（深拷贝）情况下，向指定数组中添加元素
+     * @function
+     * @protected
+     * @param {Array} array 目标数组
+     * @param {*} item 需要添加的元素
+     * @return {Array} 新的数组
+     */
+    addItemInArrayWithDeepCopy(array, item){
+        if(this.isEmpty(array) || !(array instanceof Array) || this.isEmpty(item)){
+            return array;
+        }
+
+        return array.concat(item);
+    },
+
+    /**
+     * 不修改原数组（深拷贝）情况下，更新数组数组中指定索引位置的元素
+     * @function
+     * @protected
+     * @param {Array} array 目标数组
+     * @param {number | string} index 目标元素的索引
+     * @param {*} item 需要更改成的元素
+     * 
+     * @return {Array} 新的数组
+     */
+    updateItemInArrayWithDeepCopy(array, index, item){
+        var regPos = /^\d+|0$/; // 非负整数
+        if(this.isEmpty(array) || !(array instanceof Array) || !regPos.test(index) || this.isEmpty(item)){
+            return array;
+        }
+
+        return [
+            ...array.slice(0, index),
+            item,
+            ...array.slice(index + 1)
+        ];
+    },
+
+    /**
+     * 不修改原数组（深拷贝）情况下，删除指定索引位置的元素
+     * @function
+     * @protected
+     * @param {Array} array 目标数组
+     * @param {number | string} index 目标元素的索引
+     * 
+     * @return {Array} 新的数组
+     */
+    removeItemInArrayWithDeepCopy(array, index){
+        var regPos = /^\d+|0$/; // 非负整数
+        if(this.isEmpty(array) || !(array instanceof Array) || !regPos.test(index)){
+            return array;
+        }
+
+        return [
+            ...array.splice(0, index),
+            ...array.splice(index + 1),
+        ];
+    },
+
+    /**
+     * 不修改原数组（深拷贝）情况下，设置对象中的属性
+     * @function
+     * @protected
+     * @param {object} oldObj 目标对象
+     * @param {object} item 需要追加或者修改的对象属性的对象
+     *
+     * @return {object} 新的对象
+     */
+    setItemInObjWithDeepCopy(oldObj, item){
+        if(this.isEmpty(oldObj) || !(oldObj instanceof Object) || this.isEmpty(item)){
+            return oldObj;
+        }
+
+        return {
+            ...oldObj,
+            ...item,
+        };
+    },
+
+    /**
+     * 不修改原数组（深拷贝）情况下，删除对象中的指定的属性
+     * @function
+     * @protected
+     * @param {object} oldObj 目标对象
+     * @param {string | number} filedName 目标对象中的属性
+     * 
+     * @return {object} 新的对象
+     */
+    removeItemInObjWithDeepCopy(oldObj, filedName){
+        if(this.isEmpty(oldObj) || !(oldObj instanceof Object) || this.isEmpty(filedName)){
+            return oldObj;
+        }
+
+        return Object.keys(oldObj).reduce((obj, key) => {
+            if(filedName !== key){
+                return {...obj, [key]: oldObj[key]}
+            }
+
+            return obj;
+        }, {});
     }
 }
 export default wlutils;
