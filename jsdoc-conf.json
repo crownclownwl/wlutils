@@ -1,0 +1,38 @@
+{
+    "tag":{
+        "allowUnkownTags": false
+    },
+    "source": {
+        "include": [],
+        "exclude": "./docs/",
+        "includePattern": ".+\\.js|ts(doc)?$",
+        "excludePattern": "(^|\\/|\\\\)_"
+    },
+    "markdown": {
+        "excludeTags": ["author"],
+        "hardware": true,
+        "idInHeadings": true
+    },
+    "templates": {
+        "cleverLinks": false,
+        "monospaceLinks": false,
+        "defalut": {
+            "outputSourceFiles": false,
+            "includeData": true,
+            "useLongnameInNav": true
+        }
+    },
+    "compilerOptions": {
+        "target": "es6",
+        "allowJs": true
+    },
+    "opts": {
+        "encoding": "utf-8",
+        "destination": "./docs/",
+        "recurse": true,
+        "tutorials": "./docs/tutorials/",
+        "package": "package.json",
+        "readme": "README.md"
+    },
+    "plugins":["./node_modules/better-docs"]
+}
