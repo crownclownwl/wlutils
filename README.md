@@ -353,4 +353,4 @@ $ jest --coverage
 
 
 
-[API]: http://10.10.14.50:521/idsutil/
+[API]: https://github.com/crownclownwl/wlutils/blob/master/oldDocs/idsutil/1.1.60/index.html
