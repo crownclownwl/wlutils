@@ -2,6 +2,13 @@
 
 [API]
 
+### 1.1.61
+**王磊** Deployed for branch `develop` in `2020年6月10日 14点10分`
+#### 修改模块 - Update Model
+- 删除`axios`依赖
+- 删除`loadsh` 依赖用 `underscorejs` 代替
+- 修复 `Pinyin.js` 和 EsEnum.ts `eslint` 警告bug
+
 ### 1.1.60
 **王磊** Deployed for branch `develop` in `2020年5月19日 22点04分`
 #### 修改模块 - Update Model

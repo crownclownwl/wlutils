@@ -1,12 +1,12 @@
 {
-  "name": "idsutil",
-  "version": "1.1.60",
+  "name": "wlsutil",
+  "version": "1.1.61",
   "description": "主要用于npm相关的前端js开发，集成一些公用的工具类，方便项目其他组员导入工具类",
   "main": "index.js",
   "scripts": {
     "test": "jest --coverage",
     "jsdoc": "jsdoc index.ts -c jsdoc-conf.json -p",
-    "typedoc": "typedoc index.ts --mode file --module readline,testData,qs,axios,lodash,pinyin,EsEnum,IApproveFilterItemData,IApproveFilterItemDataData,IEsEnumItem,INumberFromatOption,ICacheRequestParam"
+    "typedoc": "typedoc index.ts --mode file --module readline,testData,qs,underscore,pinyin,EsEnum,IApproveFilterItemData,IApproveFilterItemDataData,IEsEnumItem,INumberFromatOption,ICacheRequestParam"
   },
   "keywords": [
     "utils"
@@ -43,9 +43,8 @@
     "@babel/types": "^7.7.4",
     "@types/jest-diff": "^24.3.0",
     "@types/node": "^13.7.7",
-    "axios": "^0.19.0",
     "better-docs": "^1.4.7",
-    "lodash": "^4.17.15",
+    "underscore": "^4.17.15",
     "qs": "^6.8.0"
   },
   "devDependencies": {

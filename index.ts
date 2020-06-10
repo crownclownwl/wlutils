@@ -7,7 +7,7 @@
  * @author 王磊（磊皇）
  * @version 1.1.60
  * @time 2019年8月26日 10点00分
- * @lastEditTime 2020年3月3日 14点31分
+ * @lastEditTime 2020年6月10日 13点53分
  * @lastEditors 王磊（磊皇）
  */
 
@@ -16,18 +16,13 @@
  * @description 解析json工具
  */
 let stringify = require('qs').stringify;
-/**
- * @description 发送网络请求工具
- */
-import axios from 'axios';
+
 /**
  * @description 一些js工具类
  */
-import _ from 'lodash';
+import _ from 'underscore';
 
 
-// import {stringify} from 'qs';
-// import axios from 'axios';
 import pinyin from './Pinyin';
 import {IApproveFilterItemData, IEsEnumItem, INumberFromatOption, ICacheRequestParam} from './interfaces';
 import EsEnum from './EsEnum';
@@ -40,7 +35,7 @@ import EsEnum from './EsEnum';
  * @lastEditTime 2020年01月03日 11:33:46
  * @lastEditors 王磊（磊皇）
  * @exports wluitls
- * @module qs,axios,lodash,pinyin
+ * @module qs,underscore,pinyin
  * @class
  */
 class wlutils {
@@ -54,7 +49,7 @@ class wlutils {
      */
     FILERESCOURURLPREFIX:string="";
 
-    CACHEENUM: EsEnum=null;
+    CACHEENUM: EsEnum= new EsEnum([]);
 
     /**
      * @author 王磊（磊皇）
@@ -65,9 +60,11 @@ class wlutils {
      * @constructor
      */
     constructor(props){
-        console.info("++++++++++++++++++欢迎使用wlutils工具，您的使用是对我的最大鼓励！++++++++++++++++++");
-        console.info(`========================   ${props}   =============================`);
-        console.info("========================   (●'◡'●) o(*￣▽￣*)ブ   =============================");
+        if(process.env.NODE_ENV === 'development' ){
+            console.info("++++++++++++++++++欢迎使用wlutils工具，您的使用是对我的最大鼓励！++++++++++++++++++");
+            console.info(`========================   ${props}   =============================`);
+            console.info("========================   (●'◡'●) o(*￣▽￣*)ブ   =============================");
+        }
 
         /**
          * 文件资源访问路径前缀
@@ -236,30 +233,37 @@ class wlutils {
         // 判断key值是不是带层级，也就是存在 a.b.c.d.e
         if (this.isNotEmpty(key) && this.isNotEmpty(obj)) {
 
-            if (key.indexOf('.') === -1) {
-                if (this.objHasOwnProperty(key, obj) === true) {
-                    obj = obj[key]
-                }else {
-                    isDebugger === true || window.H5_Dev === "dev" ? console.info(`对象${JSON.stringify(obj)}\n中没有找到属性'${key}'或者该属性为空`):'';
-                    obj = defaultValue
+            try{
+                if (key.indexOf('.') === -1) {
+                    if (this.objHasOwnProperty(key, obj) === true) {
+                        obj = obj[key]
+                    }else {
+                        isDebugger === true || window.H5_Dev === "dev" ? console.info(`对象${JSON.stringify(obj)}\n中没有找到属性'${key}'或者该属性为空`):'';
+                        obj = defaultValue
+                    }
+                    return obj;
                 }
-                return obj;
-            }
-            let keys = key.split('.');
-            for (let kesItem of keys) {
-                if (this.objHasOwnProperty(kesItem, obj) === true) {
-                    obj = obj[kesItem];
-                } else {// 如果没有找到
-                    // 如果对象是 dom元素的实例
-                    if(obj instanceof HTMLElement){
-                        isDebugger === true || window.H5_Dev === "dev" ?console.info(`没有从dom元素中找到属性'${key}'或者该属性为空`):'';
+                let keys = key.split('.');
+                for (let kesItem of keys) {
+                    if (this.objHasOwnProperty(kesItem, obj) === true) {
+                        obj = obj[kesItem];
+                    } else {// 如果没有找到
+                        // 如果对象是 dom元素的实例
+                        if(obj instanceof HTMLElement){
+                            isDebugger === true || window.H5_Dev === "dev" ?console.info(`没有从dom元素中找到属性'${key}'或者该属性为空`):'';
+                            return defaultValue;
+                        }
+                        isDebugger === true || window.H5_Dev === "dev" ?console.info(`对象${JSON.stringify(obj)}\n中没有找到属性'${key}'或者该属性为空`):'';
                         return defaultValue;
                     }
-                    isDebugger === true || window.H5_Dev === "dev" ?console.info(`对象${JSON.stringify(obj)}\n中没有找到属性'${key}'或者该属性为空`):'';
-                    return defaultValue;
                 }
+                return obj;
+            }catch (e){
+                if(process.env.NODE_ENV === 'development' || isDebugger === true){
+                    console.error(e);
+                }
+                return defaultValue;
             }
-            return obj;
 
         }
         return defaultValue;
@@ -599,11 +603,11 @@ class wlutils {
      * */
      numberFormat(number:any, option:INumberFromatOption) {
 
-        if (number == "") {
+        if (number === "") {
             return number;
         }
     
-        if (number == null) {
+        if (number === null) {
             return number;
         }
     
@@ -683,8 +687,8 @@ class wlutils {
      * */
     isArray(obj, isEmpty=false){
         return (isEmpty === true 
-            ? this.isNotEmpty(obj) && Object.prototype.toString.call(obj) == '[object Array]'
-            : Object.prototype.toString.call(obj) == '[object Array]');
+            ? this.isNotEmpty(obj) && Object.prototype.toString.call(obj) === '[object Array]'
+            : Object.prototype.toString.call(obj) === '[object Array]');
     }
 
     /**
@@ -1075,7 +1079,7 @@ class wlutils {
                 obj[pair[0]] = pair[1];
 
                 if(this.isNotEmpty(variable)){
-                    if(pair[0] == variable){return pair[1];}
+                    if(pair[0] === variable){return pair[1];}
                 }
         }
         
@@ -1099,7 +1103,7 @@ class wlutils {
      */
     htmlEncodeByRegExp (str: string){ 
         let temp = "";
-        if(str.length == 0) return "";
+        if(str.length === 0) return "";
         temp = str.replace(/\?/g,"&iexcl;");
         temp = temp.replace(/￠/g,"&cent;");
         temp = temp.replace(/￡/g,"&pound;");
@@ -1284,7 +1288,7 @@ class wlutils {
         
         
 
-        temp = temp.replace(/\"/g,"&quot;");
+        temp = temp.replace(/"/g,"&quot;");
         return temp;
    }
 
@@ -1306,8 +1310,9 @@ class wlutils {
      */
     htmlDecodeByRegExp (str: string){ 
         let temp = "";
-        if(str.length == 0) return "";
-        temp = str.replace(/&iexcl;/g,"\?");
+        if(str.length === 0) return "";
+        temp = str.replace(/&amp;/g,"&");
+        temp = temp.replace(/&iexcl;/g,"?");
         temp = temp.replace(/&cent;/g,"￠");
         temp = temp.replace(/&pound;/g,"￡");
         temp = temp.replace(/&curren;/g,"¤");
@@ -1315,22 +1320,22 @@ class wlutils {
         temp = temp.replace(/&sect;/g,"§");
         temp = temp.replace(/&uml;/g,"¨");
         temp = temp.replace(/&copy;/g,"©");
-        temp = temp.replace(/&laquo;/g,"\?");
-        temp = temp.replace(/&not;/g,"\?");
-        temp = temp.replace(/&shy;/g,"\/x7f");
+        temp = temp.replace(/&laquo;/g,"?");
+        temp = temp.replace(/&not;/g,"?");
+        temp = temp.replace(/&shy;/g,"/x7f");
         temp = temp.replace(/&reg;/g,"®");
         temp = temp.replace(/&macr;/g,"ˉ");
         temp = temp.replace(/&deg;/g,"°");
         temp = temp.replace(/&plusmn;/g,"±");
         temp = temp.replace(/&acute;/g,"′");
         temp = temp.replace(/&micro;/g,"μ");
-        temp = temp.replace(/&para;/g,"\?");
+        temp = temp.replace(/&para;/g,"?");
         temp = temp.replace(/&middot;/g,"·");
-        temp = temp.replace(/&cedil;/g,"\?");
-        temp = temp.replace(/&raquo;/g,"\?");
-        temp = temp.replace(/&frac14;/g,"\?");
-        temp = temp.replace(/&frac12;/g,"\?");
-        temp = temp.replace(/&frac34;/g,"\?");
+        temp = temp.replace(/&cedil;/g,"?");
+        temp = temp.replace(/&raquo;/g,"?");
+        temp = temp.replace(/&frac14;/g,"?");
+        temp = temp.replace(/&frac12;/g,"?");
+        temp = temp.replace(/&frac34;/g,"?");
         temp = temp.replace(/&Agrave;/g,"À");
         temp = temp.replace(/&Aacute;/g,"Á");
         temp = temp.replace(/&circ;/g,"Â");
@@ -1398,6 +1403,7 @@ class wlutils {
         temp = temp.replace(/&lt;/g,"<");
         temp = temp.replace(/&gt;/g,">");
         temp = temp.replace(/&nbsp;/g," ");
+        temp = temp.replace(/＆nbsp;/g," ");
         temp = temp.replace(/&quot;/g,"\"");
 
 

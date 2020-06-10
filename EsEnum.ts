@@ -15,6 +15,19 @@ export interface IEsEnumItem{
     packageName: any;
 }
 
+// 自定义异常类
+class CommonException {
+    
+    message: string;
+    code: any;
+
+    constructor(message, code) {
+        this.message = message;
+        this.code = code;
+    }
+    
+}
+
 class EsEnum {
     /**
      * @property
@@ -33,18 +46,18 @@ class EsEnum {
         let typeArr = [];
 
         if (!Array.isArray(arr)){
-            throw 'arr is not an array!';
-            return;
+            throw new CommonException('arr is not an array!', 1);
         }
 
         arr.map(element => {
-            if(!element.code || !element.name) {
-                return;
+            if(!(element.code && element.name)) {
+                return false;
             }
             // 保存code值组成的数组，方便A.getName(name)类型的调用
             typeArr.push(element.code);
             // 根据code生成不同属性值，以便A.B.name类型的调用
             this[element.code] = element;
+            return true;
         });
         
         // 保存源数组
@@ -70,8 +83,7 @@ class EsEnum {
     getNameByCode(code){
         let prop = this.valueOf(code);
         if (!prop){
-            throw 'No enum constant '  + code;
-            return;
+            throw new CommonException(`No enum constant ${code}`, 1);
         }
 
         return prop.name;
@@ -93,8 +105,8 @@ class EsEnum {
             }
         }
         if (!prop){
-            throw 'No enum constant '  + name;
-            return;
+            throw new CommonException(`No enum constant ${name}`, 1);
+
         }
 
         return cacheKey;
@@ -117,8 +129,8 @@ class EsEnum {
             }
         }
         if (!prop){
-            throw 'No enum constant '  + name;
-            return;
+            throw new CommonException(`No enum constant ${name}`, 1);
+
         }
 
         return packageName;
@@ -140,8 +152,7 @@ class EsEnum {
             }
         }
         if (!prop){
-            throw 'No enum constant '  + name;
-            return;
+            throw new CommonException(`No enum constant ${code}`, 1);
         }
 
         return cacheKey;
